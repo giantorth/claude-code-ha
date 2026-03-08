@@ -377,7 +377,7 @@ start_web_terminal() {
     # --client-option reconnect=5: xterm.js auto-reconnect after 5 seconds on disconnect
     exec ttyd \
         --port "${port}" \
-        --interface 0.0.0.0 \
+        --interface 127.0.0.1 \
         --writable \
         --ping-interval 30 \
         --client-option reconnect=5 \

@@ -22,12 +22,11 @@ panel_title: "Claude Terminal Pro"
 panel_admin: true
 
 # Port configuration
+# ttyd (7681) is bound to localhost only and accessed via the /terminal proxy on 7680
 ports:
   7680/tcp: 7680
-  7681/tcp: 7681
 ports_description:
   7680/tcp: "Image upload service and web interface"
-  7681/tcp: "ttyd terminal (embedded in web interface)"
 
 # Add-on configuration options
 options:
