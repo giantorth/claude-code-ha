@@ -97,7 +97,7 @@ app.post('/upload', upload.single('image'), (req, res) => {
 // Proxy endpoint for ttyd terminal
 // This allows ttyd to work through Home Assistant ingress
 // Handles both HTTP and WebSocket connections
-app.use('/terminal', createProxyMiddleware({
+const terminalProxy = createProxyMiddleware({
     target: `http://localhost:${TTYD_PORT}`,
     changeOrigin: true,
     ws: true, // Enable WebSocket proxying
@@ -114,7 +114,8 @@ app.use('/terminal', createProxyMiddleware({
         }
     },
     logLevel: 'warn'
-}));
+});
+app.use('/terminal', terminalProxy);
 
 // Serve static files (HTML interface) - MUST be after API routes
 app.use(express.static(path.join(__dirname, 'public')));
@@ -142,6 +143,11 @@ app.use((err, req, res, next) => {
 
 // Create HTTP server and start listening
 const server = http.createServer(app);
+
+// Manually subscribe to 'upgrade' so the proxy handles WebSocket connections.
+// http-proxy-middleware v2 with a separately created http.createServer does not
+// auto-subscribe, which causes ttyd's WebSocket channel to fail silently.
+server.on('upgrade', terminalProxy.upgrade);
 
 server.listen(PORT, '0.0.0.0', () => {
     console.log(`Claude Terminal Image Service running on port ${PORT}`);
